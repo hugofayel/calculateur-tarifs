@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tarifs">
+<title>Calculateur de tarif</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f2f2f7;
+    color: #1c1c1e;
+    padding: 20px;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .container { max-width: 420px; margin: 0 auto; }
+  h1 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: -0.5px;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    background: #e5e5ea;
+    padding: 4px;
+    border-radius: 12px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #8e8e93;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: #fff;
+    color: #1c1c1e;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #8e8e93;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+  select, input[type="number"] {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 17px;
+    border: 1.5px solid #e5e5ea;
+    border-radius: 12px;
+    background: #f9f9fb;
+    color: #1c1c1e;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+  select:focus, input:focus {
+    border-color: #007aff;
+    background: #fff;
+  }
+  button.calc {
+    width: 100%;
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    background: #007aff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  button.calc:active { opacity: 0.7; }
+  .result { display: none; }
+  .result.visible { display: block; }
+  .result-main {
+    font-size: 36px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 2px;
+    color: #007aff;
+    letter-spacing: -1px;
+  }
+  .result-label {
+    font-size: 13px;
+    color: #8e8e93;
+    text-align: center;
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+  .detail { font-size: 15px; color: #3a3a3c; }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f7;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row span:last-child { font-weight: 600; }
+  .note {
+    font-size: 11px;
+    color: #8e8e93;
+    text-align: center;
+    margin-top: 12px;
+    line-height: 1.4;
+  }
+  .error {
+    color: #ff3b30;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 500;
+  }
+  .grid-section h2 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: #1c1c1e;
+  }
+  .grid-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f7;
+    gap: 8px;
+  }
+  .grid-row:last-child { border-bottom: none; }
+  .grid-row > label {
+    font-size: 14px;
+    color: #3a3a3c;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 0;
+    flex: 1;
+  }
+  .grid-row > input {
+    width: 85px;
+    padding: 8px 10px;
+    font-size: 15px;
+    border: 1.5px solid #e5e5ea;
+    border-radius: 8px;
+    background: #f9f9fb;
+    text-align: right;
+    font-weight: 600;
+    margin: 0;
+  }
+  .grid-row > input:focus {
+    border-color: #007aff;
+    background: #fff;
+  }
+  .grid-row > .unit {
+    font-size: 12px;
+    color: #8e8e93;
+    width: 40px;
+    text-align: right;
+  }
+  button.reset {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ff3b30;
+    background: #fff;
+    border: 1.5px solid #ff3b30;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Calculateur de tarif</h1>
+  
+  <div class="tabs">
+    <button class="tab active" id="tabBtnCalc">Calculateur</button>
+    <button class="tab" id="tabBtnGrid">Grilles</button>
+  </div>
+  
+  <div id="tab-calc" class="tab-content active">
+    <div class="card">
+      <label for="type">Type de prestation</label>
+      <select id="type">
+        <option value="toiture">Démoussage toiture</option>
+        <option value="facade">Nettoyage façade</option>
+        <option value="solaire">Nettoyage panneaux solaires</option>
+      </select>
+      
+      <label for="surface">Surface totale (m²)</label>
+      <input type="number" id="surface" placeholder="Ex : 150" min="1" step="1" inputmode="decimal">
+      
+      <button class="calc" id="btnCalc">Calculer le tarif</button>
+      <div id="error" class="error"></div>
+    </div>
+    
+    <div class="card result" id="result">
+      <div class="result-main" id="resultMain">—</div>
+      <div class="result-label">Total HT</div>
+      <div class="detail" id="detail"></div>
+      <div class="note">TVA non applicable, art. 293 B du CGI<br>Déplacement inclus</div>
+    </div>
+  </div>
+  
+  <div id="tab-grid" class="tab-content">
+    
+    <div class="card grid-section">
+      <h2>Démoussage toiture</h2>
+      <div class="grid-row">
+        <label>Minimum de facturation</label>
+        <input type="number" id="cfg_toiture_min" step="1">
+        <span class="unit">€</span>
+      </div>
+      <div class="grid-row">
+        <label>Seuil minimum</label>
+        <input type="number" id="cfg_toiture_seuilMin" step="1">
+        <span class="unit">m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 0-150 m²</label>
+        <input type="number" id="cfg_toiture_r0" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 150-300 m²</label>
+        <input type="number" id="cfg_toiture_r1" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 300-500 m²</label>
+        <input type="number" id="cfg_toiture_r2" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 500-800 m²</label>
+        <input type="number" id="cfg_toiture_r3" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 800-1200 m²</label>
+        <input type="number" id="cfg_toiture_r4" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif &gt; 1200 m²</label>
+        <input type="number" id="cfg_toiture_r5" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+    </div>
+    
+    <div class="card grid-section">
+      <h2>Nettoyage façade</h2>
+      <div class="grid-row">
+        <label>Minimum de facturation</label>
+        <input type="number" id="cfg_facade_min" step="1">
+        <span class="unit">€</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 0-150 m²</label>
+        <input type="number" id="cfg_facade_rate0" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 150-300 m²</label>
+        <input type="number" id="cfg_facade_r0" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 300-500 m²</label>
+        <input type="number" id="cfg_facade_r1" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 500-800 m²</label>
+        <input type="number" id="cfg_facade_r2" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 800-1200 m²</label>
+        <input type="number" id="cfg_facade_r3" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif &gt; 1200 m²</label>
+        <input type="number" id="cfg_facade_r4" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+    </div>
+    
+    <div class="card grid-section">
+      <h2>Nettoyage panneaux solaires</h2>
+      <div class="grid-row">
+        <label>Minimum (0-30 m²)</label>
+        <input type="number" id="cfg_solaire_min" step="1">
+        <span class="unit">€</span>
+      </div>
+      <div class="grid-row">
+        <label>Forfait 30-50 m²</label>
+        <input type="number" id="cfg_solaire_f0" step="1">
+        <span class="unit">€</span>
+      </div>
+      <div class="grid-row">
+        <label>Forfait 50-75 m²</label>
+        <input type="number" id="cfg_solaire_f1" step="1">
+        <span class="unit">€</span>
+      </div>
+      <div class="grid-row">
+        <label>Forfait 75-100 m²</label>
+        <input type="number" id="cfg_solaire_f2" step="1">
+        <span class="unit">€</span>
+      </div>
+      <div class="grid-row">
+        <label>Forfait 100-250 m²</label>
+        <input type="number" id="cfg_solaire_f3" step="1">
+        <span class="unit">€</span>
+      </div>
+      <div class="grid-row">
+        <label>Forfait 250-500 m²</label>
+        <input type="number" id="cfg_solaire_f4" step="1">
+        <span class="unit">€</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 500-1000 m²</label>
+        <input type="number" id="cfg_solaire_r0" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 1000-1500 m²</label>
+        <input type="number" id="cfg_solaire_r1" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif 1500-2000 m²</label>
+        <input type="number" id="cfg_solaire_r2" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Tarif &gt; 2000 m²</label>
+        <input type="number" id="cfg_solaire_r3" step="0.01">
+        <span class="unit">€/m²</span>
+      </div>
+    </div>
+    
+    <button class="reset" id="btnReset">Réinitialiser les valeurs par défaut</button>
+    <div id="storageWarning" class="note" style="display:none; color:#ff9500; margin-top:12px;">
+      Stockage local indisponible. Les modifications ne seront pas sauvegardées.
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var DEFAULTS = {
+    toiture: { min: 210, seuilMin: 38, rates: [5.50, 4.50, 4.20, 3.90, 3.70, 3.50] },
+    facade: { min: 250, rate0: 6.50, rates: [5.20, 4.60, 4.20, 3.90, 3.60] },
+    solaire: { min: 180, forfaits: [215, 250, 305, 345, 425], rates: [0.85, 0.75, 0.65, 0.55] }
+  };
+
+  var config = null;
+  var storageAvailable = true;
+
+  function deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function merge(base, override) {
+    var result = {};
+    var key;
+    for (key in base) {
+      if (base.hasOwnProperty(key)) result[key] = base[key];
+    }
+    for (key in override) {
+      if (override.hasOwnProperty(key)) result[key] = override[key];
+    }
+    return result;
+  }
+
+  function loadConfig() {
+    try {
+      var saved = window.localStorage.getItem('tarifConfig');
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        return {
+          toiture: merge(DEFAULTS.toiture, parsed.toiture || {}),
+          facade: merge(DEFAULTS.facade, parsed.facade || {}),
+          solaire: merge(DEFAULTS.solaire, parsed.solaire || {})
+        };
+      }
+    } catch (e) {
+      storageAvailable = false;
+    }
+    return deepClone(DEFAULTS);
+  }
+
+  function saveConfig() {
+    try {
+      window.localStorage.setItem('tarifConfig', JSON.stringify(config));
+    } catch (e) {
+      storageAvailable = false;
+      var warn = document.getElementById('storageWarning');
+      if (warn) warn.style.display = 'block';
+    }
+  }
+
+  function updateConfig(service, key, value, index) {
+    var num = parseFloat(value);
+    if (isNaN(num)) num = 0;
+    if (index !== undefined && index !== null) {
+      config[service][key][index] = num;
+    } else {
+      config[service][key] = num;
+    }
+    saveConfig();
+  }
+
+  function resetConfig() {
+    if (window.confirm('Réinitialiser tous les tarifs par défaut ?')) {
+      config = deepClone(DEFAULTS);
+      saveConfig();
+      populateGrid();
+    }
+  }
+
+  function populateGrid() {
+    var i;
+    document.getElementById('cfg_toiture_min').value = config.toiture.min;
+    document.getElementById('cfg_toiture_seuilMin').value = config.toiture.seuilMin;
+    for (i = 0; i < 6; i++) {
+      document.getElementById('cfg_toiture_r' + i).value = config.toiture.rates[i];
+    }
+    document.getElementById('cfg_facade_min').value = config.facade.min;
+    document.getElementById('cfg_facade_rate0').value = config.facade.rate0;
+    for (i = 0; i < 5; i++) {
+      document.getElementById('cfg_facade_r' + i).value = config.facade.rates[i];
+    }
+    document.getElementById('cfg_solaire_min').value = config.solaire.min;
+    for (i = 0; i < 5; i++) {
+      document.getElementById('cfg_solaire_f' + i).value = config.solaire.forfaits[i];
+    }
+    for (i = 0; i < 4; i++) {
+      document.getElementById('cfg_solaire_r' + i).value = config.solaire.rates[i];
+    }
+    if (!storageAvailable) {
+      var warn = document.getElementById('storageWarning');
+      if (warn) warn.style.display = 'block';
+    }
+  }
+
+  function calculerToiture(S) {
+    var c = config.toiture;
+    if (S <= c.seuilMin) return c.min;
+    if (S <= 150) return S * c.rates[0];
+    var base = 150 * c.rates[0];
+    if (S <= 300) return base + (S - 150) * c.rates[1];
+    base += 150 * c.rates[1];
+    if (S <= 500) return base + (S - 300) * c.rates[2];
+    base += 200 * c.rates[2];
+    if (S <= 800) return base + (S - 500) * c.rates[3];
+    base += 300 * c.rates[3];
+    if (S <= 1200) return base + (S - 800) * c.rates[4];
+    base += 400 * c.rates[4];
+    return base + (S - 1200) * c.rates[5];
+  }
+
+  function calculerFacade(S) {
+    var c = config.facade;
+    if (S <= 150) return Math.max(S * c.rate0, c.min);
+    var base = 150 * c.rate0;
+    if (S <= 300) return base + (S - 150) * c.rates[0];
+    base += 150 * c.rates[0];
+    if (S <= 500) return base + (S - 300) * c.rates[1];
+    base += 200 * c.rates[1];
+    if (S <= 800) return base + (S - 500) * c.rates[2];
+    base += 300 * c.rates[2];
+    if (S <= 1200) return base + (S - 800) * c.rates[3];
+    base += 400 * c.rates[3];
+    return base + (S - 1200) * c.rates[4];
+  }
+
+  function calculerSolaire(S) {
+    var c = config.solaire;
+    if (S <= 30) return c.min;
+    if (S <= 50) return c.forfaits[0];
+    if (S <= 75) return c.forfaits[1];
+    if (S <= 100) return c.forfaits[2];
+    if (S <= 250) return c.forfaits[3];
+    if (S <= 500) return c.forfaits[4];
+    if (S <= 1000) return S * c.rates[0];
+    if (S <= 1500) return S * c.rates[1];
+    if (S <= 2000) return S * c.rates[2];
+    return S * c.rates[3];
+  }
+
+  function formatEuro(n) {
+    try {
+      return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20AC';
+    } catch (e) {
+      return n.toFixed(2) + ' \u20AC';
+    }
+  }
+
+  function showTab(name) {
+    var contents = document.querySelectorAll('.tab-content');
+    var tabs = document.querySelectorAll('.tab');
+    var i;
+    for (i = 0; i < contents.length; i++) contents[i].classList.remove('active');
+    for (i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'calc') document.getElementById('tabBtnCalc').classList.add('active');
+    else document.getElementById('tabBtnGrid').classList.add('active');
+  }
+
+  function calculer() {
+    try {
+      var type = document.getElementById('type').value;
+      var surface = parseFloat(document.getElementById('surface').value);
+      var errorEl = document.getElementById('error');
+      var resultEl = document.getElementById('result');
+      
+      errorEl.textContent = '';
+      
+      if (isNaN(surface) || surface <= 0) {
+        errorEl.textContent = 'Veuillez saisir une surface valide.';
+        resultEl.classList.remove('visible');
+        return;
+      }
+      
+      var total, detailHtml;
+      
+      if (type === 'toiture') {
+        total = calculerToiture(surface);
+        detailHtml = '<div class="detail-row"><span>Surface</span><span>' + surface + ' m\u00B2</span></div>';
+        detailHtml += '<div class="detail-row"><span>Prestation</span><span>D\u00E9moussage toiture</span></div>';
+        if (surface <= config.toiture.seuilMin) {
+          detailHtml += '<div class="detail-row"><span>Tarif</span><span>Minimum de facturation</span></div>';
+        }
+      } else if (type === 'facade') {
+        total = calculerFacade(surface);
+        detailHtml = '<div class="detail-row"><span>Surface</span><span>' + surface + ' m\u00B2</span></div>';
+        detailHtml += '<div class="detail-row"><span>Prestation</span><span>Nettoyage fa\u00E7ade</span></div>';
+        if (surface <= 150 && surface * config.facade.rate0 < config.facade.min) {
+          detailHtml += '<div class="detail-row"><span>Tarif</span><span>Minimum de facturation</span></div>';
+        }
+      } else {
+        total = calculerSolaire(surface);
+        detailHtml = '<div class="detail-row"><span>Surface</span><span>' + surface + ' m\u00B2</span></div>';
+        detailHtml += '<div class="detail-row"><span>Prestation</span><span>Nettoyage panneaux solaires</span></div>';
+        if (surface <= 30) {
+          detailHtml += '<div class="detail-row"><span>Tarif</span><span>Minimum de facturation</span></div>';
+        } else if (surface <= 500) {
+          detailHtml += '<div class="detail-row"><span>Tarif</span><span>Forfait</span></div>';
+        }
+      }
+      
+      var prixM2 = total / surface;
+      detailHtml += '<div class="detail-row"><span>Prix moyen</span><span>' + formatEuro(prixM2) + ' / m\u00B2</span></div>';
+      
+      document.getElementById('resultMain').textContent = formatEuro(total);
+      document.getElementById('detail').innerHTML = detailHtml;
+      resultEl.classList.add('visible');
+    } catch (err) {
+      document.getElementById('error').textContent = 'Erreur : ' + err.message;
+    }
+  }
+
+  // Attacher les gestionnaires d'événements
+  function init() {
+    config = loadConfig();
+    populateGrid();
+    
+    document.getElementById('tabBtnCalc').addEventListener('click', function() { showTab('calc'); });
+    document.getElementById('tabBtnGrid').addEventListener('click', function() { showTab('grid'); });
+    document.getElementById('btnCalc').addEventListener('click', calculer);
+    document.getElementById('btnReset').addEventListener('click', resetConfig);
+    
+    // Gestionnaires pour les champs de la grille
+    function bind(id, service, key, index) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', function() {
+        updateConfig(service, key, this.value, index);
+      });
+    }
+    
+    bind('cfg_toiture_min', 'toiture', 'min');
+    bind('cfg_toiture_seuilMin', 'toiture', 'seuilMin');
+    bind('cfg_toiture_r0', 'toiture', 'rates', 0);
+    bind('cfg_toiture_r1', 'toiture', 'rates', 1);
+    bind('cfg_toiture_r2', 'toiture', 'rates', 2);
+    bind('cfg_toiture_r3', 'toiture', 'rates', 3);
+    bind('cfg_toiture_r4', 'toiture', 'rates', 4);
+    bind('cfg_toiture_r5', 'toiture', 'rates', 5);
+    
+    bind('cfg_facade_min', 'facade', 'min');
+    bind('cfg_facade_rate0', 'facade', 'rate0');
+    bind('cfg_facade_r0', 'facade', 'rates', 0);
+    bind('cfg_facade_r1', 'facade', 'rates', 1);
+    bind('cfg_facade_r2', 'facade', 'rates', 2);
+    bind('cfg_facade_r3', 'facade', 'rates', 3);
+    bind('cfg_facade_r4', 'facade', 'rates', 4);
+    
+    bind('cfg_solaire_min', 'solaire', 'min');
+    bind('cfg_solaire_f0', 'solaire', 'forfaits', 0);
+    bind('cfg_solaire_f1', 'solaire', 'forfaits', 1);
+    bind('cfg_solaire_f2', 'solaire', 'forfaits', 2);
+    bind('cfg_solaire_f3', 'solaire', 'forfaits', 3);
+    bind('cfg_solaire_f4', 'solaire', 'forfaits', 4);
+    bind('cfg_solaire_r0', 'solaire', 'rates', 0);
+    bind('cfg_solaire_r1', 'solaire', 'rates', 1);
+    bind('cfg_solaire_r2', 'solaire', 'rates', 2);
+    bind('cfg_solaire_r3', 'solaire', 'rates', 3);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
