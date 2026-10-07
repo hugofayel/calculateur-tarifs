@@ -35,8 +35,8 @@
   }
   .tab {
     flex: 1;
-    padding: 10px;
-    font-size: 15px;
+    padding: 10px 6px;
+    font-size: 13px;
     font-weight: 600;
     color: #8e8e93;
     background: transparent;
@@ -67,7 +67,7 @@
     letter-spacing: 0.6px;
     margin-bottom: 8px;
   }
-  select, input[type="number"] {
+  select, input[type="number"], input[type="text"] {
     width: 100%;
     padding: 14px 16px;
     font-size: 17px;
@@ -123,6 +123,16 @@
   }
   .detail-row:last-child { border-bottom: none; }
   .detail-row span:last-child { font-weight: 600; }
+  .detail-row.marge span:last-child { color: #34c759; }
+  .detail-section {
+    font-size: 13px;
+    font-weight: 700;
+    color: #007aff;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-top: 16px;
+    margin-bottom: 4px;
+  }
   .note {
     font-size: 11px;
     color: #8e8e93;
@@ -162,7 +172,7 @@
     flex: 1;
   }
   .grid-row > input {
-    width: 85px;
+    width: 90px;
     padding: 8px 10px;
     font-size: 15px;
     border: 1.5px solid #e5e5ea;
@@ -176,10 +186,14 @@
     border-color: #007aff;
     background: #fff;
   }
+  .grid-row > input[type="text"] {
+    width: 120px;
+    text-align: left;
+  }
   .grid-row > .unit {
     font-size: 12px;
     color: #8e8e93;
-    width: 40px;
+    width: 45px;
     text-align: right;
   }
   button.reset {
@@ -203,8 +217,10 @@
   <div class="tabs">
     <button class="tab active" id="tabBtnCalc">Calculateur</button>
     <button class="tab" id="tabBtnGrid">Grilles</button>
+    <button class="tab" id="tabBtnDosage">Dosage</button>
   </div>
   
+  <!-- ===== ONGLET CALCULATEUR ===== -->
   <div id="tab-calc" class="tab-content active">
     <div class="card">
       <label for="type">Type de prestation</label>
@@ -229,6 +245,7 @@
     </div>
   </div>
   
+  <!-- ===== ONGLET GRILLES ===== -->
   <div id="tab-grid" class="tab-content">
     
     <div class="card grid-section">
@@ -373,6 +390,96 @@
       Stockage local indisponible. Les modifications ne seront pas sauvegardées.
     </div>
   </div>
+  
+  <!-- ===== ONGLET DOSAGE ===== -->
+  <div id="tab-dosage" class="tab-content">
+    
+    <div class="card grid-section">
+      <h2>Démoussage toiture</h2>
+      <div class="grid-row">
+        <label>Nom du produit</label>
+        <input type="text" id="cfg_dosage_toiture_nom">
+      </div>
+      <div class="grid-row">
+        <label>Débit pompe</label>
+        <input type="number" id="cfg_dosage_toiture_debit" step="0.1">
+        <span class="unit">L/min</span>
+      </div>
+      <div class="grid-row">
+        <label>Dosage</label>
+        <input type="number" id="cfg_dosage_toiture_dosage" step="0.1">
+        <span class="unit">%</span>
+      </div>
+      <div class="grid-row">
+        <label>Temps par m²</label>
+        <input type="number" id="cfg_dosage_toiture_temps" step="0.01">
+        <span class="unit">min/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Prix produit pur</label>
+        <input type="number" id="cfg_dosage_toiture_prix" step="0.01">
+        <span class="unit">€/L</span>
+      </div>
+    </div>
+    
+    <div class="card grid-section">
+      <h2>Nettoyage façade</h2>
+      <div class="grid-row">
+        <label>Nom du produit</label>
+        <input type="text" id="cfg_dosage_facade_nom">
+      </div>
+      <div class="grid-row">
+        <label>Débit pompe</label>
+        <input type="number" id="cfg_dosage_facade_debit" step="0.1">
+        <span class="unit">L/min</span>
+      </div>
+      <div class="grid-row">
+        <label>Dosage</label>
+        <input type="number" id="cfg_dosage_facade_dosage" step="0.1">
+        <span class="unit">%</span>
+      </div>
+      <div class="grid-row">
+        <label>Temps par m²</label>
+        <input type="number" id="cfg_dosage_facade_temps" step="0.01">
+        <span class="unit">min/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Prix produit pur</label>
+        <input type="number" id="cfg_dosage_facade_prix" step="0.01">
+        <span class="unit">€/L</span>
+      </div>
+    </div>
+    
+    <div class="card grid-section">
+      <h2>Nettoyage panneaux solaires</h2>
+      <div class="grid-row">
+        <label>Nom du produit</label>
+        <input type="text" id="cfg_dosage_solaire_nom">
+      </div>
+      <div class="grid-row">
+        <label>Débit pompe</label>
+        <input type="number" id="cfg_dosage_solaire_debit" step="0.1">
+        <span class="unit">L/min</span>
+      </div>
+      <div class="grid-row">
+        <label>Dosage</label>
+        <input type="number" id="cfg_dosage_solaire_dosage" step="0.1">
+        <span class="unit">%</span>
+      </div>
+      <div class="grid-row">
+        <label>Temps par m²</label>
+        <input type="number" id="cfg_dosage_solaire_temps" step="0.01">
+        <span class="unit">min/m²</span>
+      </div>
+      <div class="grid-row">
+        <label>Prix produit pur</label>
+        <input type="number" id="cfg_dosage_solaire_prix" step="0.01">
+        <span class="unit">€/L</span>
+      </div>
+    </div>
+    
+    <button class="reset" id="btnResetDosage">Réinitialiser les dosages par défaut</button>
+  </div>
 </div>
 
 <script>
@@ -385,7 +492,14 @@
     solaire: { min: 180, forfaits: [215, 250, 305, 345, 425], rates: [0.85, 0.75, 0.65, 0.55] }
   };
 
+  var DEFAULTS_DOSAGE = {
+    toiture: { nom: 'DYLMOUSS', debit: 5, dosage: 5, temps: 0.20, prix: 15.60 },
+    facade: { nom: 'Produit façade', debit: 5, dosage: 5, temps: 0.20, prix: 15.60 },
+    solaire: { nom: 'Produit solaire', debit: 5, dosage: 3, temps: 0.15, prix: 10.00 }
+  };
+
   var config = null;
+  var dosage = null;
   var storageAvailable = true;
 
   function deepClone(obj) {
@@ -421,6 +535,23 @@
     return deepClone(DEFAULTS);
   }
 
+  function loadDosage() {
+    try {
+      var saved = window.localStorage.getItem('tarifDosage');
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        return {
+          toiture: merge(DEFAULTS_DOSAGE.toiture, parsed.toiture || {}),
+          facade: merge(DEFAULTS_DOSAGE.facade, parsed.facade || {}),
+          solaire: merge(DEFAULTS_DOSAGE.solaire, parsed.solaire || {})
+        };
+      }
+    } catch (e) {
+      storageAvailable = false;
+    }
+    return deepClone(DEFAULTS_DOSAGE);
+  }
+
   function saveConfig() {
     try {
       window.localStorage.setItem('tarifConfig', JSON.stringify(config));
@@ -428,6 +559,14 @@
       storageAvailable = false;
       var warn = document.getElementById('storageWarning');
       if (warn) warn.style.display = 'block';
+    }
+  }
+
+  function saveDosage() {
+    try {
+      window.localStorage.setItem('tarifDosage', JSON.stringify(dosage));
+    } catch (e) {
+      storageAvailable = false;
     }
   }
 
@@ -442,11 +581,30 @@
     saveConfig();
   }
 
+  function updateDosage(service, key, value) {
+    if (key === 'nom') {
+      dosage[service][key] = value;
+    } else {
+      var num = parseFloat(value);
+      if (isNaN(num)) num = 0;
+      dosage[service][key] = num;
+    }
+    saveDosage();
+  }
+
   function resetConfig() {
     if (window.confirm('Réinitialiser tous les tarifs par défaut ?')) {
       config = deepClone(DEFAULTS);
       saveConfig();
       populateGrid();
+    }
+  }
+
+  function resetDosage() {
+    if (window.confirm('Réinitialiser tous les dosages par défaut ?')) {
+      dosage = deepClone(DEFAULTS_DOSAGE);
+      saveDosage();
+      populateDosage();
     }
   }
 
@@ -473,6 +631,17 @@
       var warn = document.getElementById('storageWarning');
       if (warn) warn.style.display = 'block';
     }
+  }
+
+  function populateDosage() {
+    var services = ['toiture', 'facade', 'solaire'];
+    services.forEach(function(s) {
+      document.getElementById('cfg_dosage_' + s + '_nom').value = dosage[s].nom;
+      document.getElementById('cfg_dosage_' + s + '_debit').value = dosage[s].debit;
+      document.getElementById('cfg_dosage_' + s + '_dosage').value = dosage[s].dosage;
+      document.getElementById('cfg_dosage_' + s + '_temps').value = dosage[s].temps;
+      document.getElementById('cfg_dosage_' + s + '_prix').value = dosage[s].prix;
+    });
   }
 
   function calculerToiture(S) {
@@ -528,6 +697,14 @@
     }
   }
 
+  function formatNombre(n, decimales) {
+    try {
+      return n.toLocaleString('fr-FR', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
+    } catch (e) {
+      return n.toFixed(decimales);
+    }
+  }
+
   function showTab(name) {
     var contents = document.querySelectorAll('.tab-content');
     var tabs = document.querySelectorAll('.tab');
@@ -536,7 +713,8 @@
     for (i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
     document.getElementById('tab-' + name).classList.add('active');
     if (name === 'calc') document.getElementById('tabBtnCalc').classList.add('active');
-    else document.getElementById('tabBtnGrid').classList.add('active');
+    else if (name === 'grid') document.getElementById('tabBtnGrid').classList.add('active');
+    else document.getElementById('tabBtnDosage').classList.add('active');
   }
 
   function calculer() {
@@ -584,6 +762,30 @@
       var prixM2 = total / surface;
       detailHtml += '<div class="detail-row"><span>Prix moyen</span><span>' + formatEuro(prixM2) + ' / m\u00B2</span></div>';
       
+      // ===== CALCUL DU DOSAGE =====
+      var d = dosage[type];
+      var tempsTotal = surface * d.temps;
+      var volumeSolution = tempsTotal * d.debit;
+      var produitPur = volumeSolution * (d.dosage / 100);
+      var coutProduit = produitPur * d.prix;
+      var coutProduitM2 = coutProduit / surface;
+      
+      // ===== CALCUL DE LA MARGE BRUTE =====
+      var margeBruteTotale = total - coutProduit;
+      var margeBruteM2 = margeBruteTotale / surface;
+      
+      detailHtml += '<div class="detail-section">Produit n\u00E9cessaire</div>';
+      detailHtml += '<div class="detail-row"><span>Produit</span><span>' + d.nom + '</span></div>';
+      detailHtml += '<div class="detail-row"><span>Temps total</span><span>' + formatNombre(tempsTotal, 1) + ' min</span></div>';
+      detailHtml += '<div class="detail-row"><span>Solution totale</span><span>' + formatNombre(volumeSolution, 1) + ' L</span></div>';
+      detailHtml += '<div class="detail-row"><span>Produit pur</span><span>' + formatNombre(produitPur, 2) + ' L</span></div>';
+      detailHtml += '<div class="detail-row"><span>Co\u00FBt produit</span><span>' + formatEuro(coutProduit) + '</span></div>';
+      detailHtml += '<div class="detail-row"><span>Co\u00FBt produit / m\u00B2</span><span>' + formatEuro(coutProduitM2) + '</span></div>';
+      
+      detailHtml += '<div class="detail-section">Marge brute</div>';
+      detailHtml += '<div class="detail-row marge"><span>Marge brute totale</span><span>' + formatEuro(margeBruteTotale) + '</span></div>';
+      detailHtml += '<div class="detail-row marge"><span>Marge brute / m\u00B2</span><span>' + formatEuro(margeBruteM2) + '</span></div>';
+      
       document.getElementById('resultMain').textContent = formatEuro(total);
       document.getElementById('detail').innerHTML = detailHtml;
       resultEl.classList.add('visible');
@@ -592,17 +794,19 @@
     }
   }
 
-  // Attacher les gestionnaires d'événements
   function init() {
     config = loadConfig();
+    dosage = loadDosage();
     populateGrid();
+    populateDosage();
     
     document.getElementById('tabBtnCalc').addEventListener('click', function() { showTab('calc'); });
     document.getElementById('tabBtnGrid').addEventListener('click', function() { showTab('grid'); });
+    document.getElementById('tabBtnDosage').addEventListener('click', function() { showTab('dosage'); });
     document.getElementById('btnCalc').addEventListener('click', calculer);
     document.getElementById('btnReset').addEventListener('click', resetConfig);
+    document.getElementById('btnResetDosage').addEventListener('click', resetDosage);
     
-    // Gestionnaires pour les champs de la grille
     function bind(id, service, key, index) {
       var el = document.getElementById(id);
       if (!el) return;
@@ -638,6 +842,22 @@
     bind('cfg_solaire_r1', 'solaire', 'rates', 1);
     bind('cfg_solaire_r2', 'solaire', 'rates', 2);
     bind('cfg_solaire_r3', 'solaire', 'rates', 3);
+    
+    function bindDosage(id, service, key) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', function() {
+        updateDosage(service, key, this.value);
+      });
+    }
+    
+    ['toiture', 'facade', 'solaire'].forEach(function(s) {
+      bindDosage('cfg_dosage_' + s + '_nom', s, 'nom');
+      bindDosage('cfg_dosage_' + s + '_debit', s, 'debit');
+      bindDosage('cfg_dosage_' + s + '_dosage', s, 'dosage');
+      bindDosage('cfg_dosage_' + s + '_temps', s, 'temps');
+      bindDosage('cfg_dosage_' + s + '_prix', s, 'prix');
+    });
   }
 
   if (document.readyState === 'loading') {
