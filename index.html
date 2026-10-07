@@ -18,9 +18,7 @@
     -webkit-tap-highlight-color: transparent;
     transition: padding-bottom 0.2s;
   }
-  body.has-validation {
-    padding-bottom: 90px;
-  }
+  body.has-validation { padding-bottom: 90px; }
   .container { max-width: 420px; margin: 0 auto; }
   h1 {
     font-size: 24px;
@@ -124,9 +122,10 @@
     justify-content: space-between;
     padding: 8px 0;
     border-bottom: 1px solid #f2f2f7;
+    gap: 8px;
   }
   .detail-row:last-child { border-bottom: none; }
-  .detail-row span:last-child { font-weight: 600; }
+  .detail-row span:last-child { font-weight: 600; text-align: right; }
   .detail-row.marge span:last-child { color: #34c759; }
   .detail-section {
     font-size: 13px;
@@ -212,6 +211,78 @@
     cursor: pointer;
     margin-top: 8px;
   }
+  /* Zones */
+  .zone {
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #f2f2f7;
+  }
+  .zone:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .zone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #007aff;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .zone-remove {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: #ff3b30;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+  }
+  .zone-remove:active { opacity: 0.7; }
+  .add-zone {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #007aff;
+    background: #fff;
+    border: 1.5px dashed #007aff;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 18px;
+  }
+  .add-zone:active { opacity: 0.7; }
+  /* Segmented control */
+  .segmented {
+    display: flex;
+    background: #e5e5ea;
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 18px;
+  }
+  .seg-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8e8e93;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .seg-btn.active {
+    background: #fff;
+    color: #1c1c1e;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
   /* Barre de validation */
   .validation-bar {
     position: fixed;
@@ -227,9 +298,7 @@
     gap: 8px;
     z-index: 100;
   }
-  .validation-bar.visible {
-    display: flex;
-  }
+  .validation-bar.visible { display: flex; }
   .validation-text {
     flex: 1;
     font-size: 12px;
@@ -246,15 +315,9 @@
     cursor: pointer;
     white-space: nowrap;
   }
-  .btn-cancel {
-    background: #e5e5ea;
-    color: #1c1c1e;
-  }
+  .btn-cancel { background: #e5e5ea; color: #1c1c1e; }
   .btn-cancel:active { opacity: 0.7; }
-  .btn-save {
-    background: #34c759;
-    color: #fff;
-  }
+  .btn-save { background: #34c759; color: #fff; }
   .btn-save:active { opacity: 0.7; }
 </style>
 </head>
@@ -271,15 +334,14 @@
   <!-- ===== ONGLET CALCULATEUR ===== -->
   <div id="tab-calc" class="tab-content active">
     <div class="card">
-      <label for="type">Type de prestation</label>
-      <select id="type">
-        <option value="toiture">Démoussage toiture</option>
-        <option value="facade">Nettoyage façade</option>
-        <option value="solaire">Nettoyage panneaux solaires</option>
-      </select>
+      <div id="zonesContainer"></div>
+      <button type="button" class="add-zone" id="btnAddZone">+ Ajouter une zone</button>
       
-      <label for="surface">Surface totale (m²)</label>
-      <input type="number" id="surface" placeholder="Ex : 150" min="1" step="1" inputmode="decimal">
+      <label>Affichage</label>
+      <div class="segmented">
+        <button type="button" class="seg-btn active" data-mode="HT">HT</button>
+        <button type="button" class="seg-btn" data-mode="TTC">TTC</button>
+      </div>
       
       <button class="calc" id="btnCalc">Calculer le tarif</button>
       <div id="error" class="error"></div>
@@ -287,7 +349,7 @@
     
     <div class="card result" id="result">
       <div class="result-main" id="resultMain">—</div>
-      <div class="result-label">Total HT</div>
+      <div class="result-label" id="resultLabel">Total HT</div>
       <div class="detail" id="detail"></div>
       <div class="note">TVA non applicable, art. 293 B du CGI<br>Déplacement inclus</div>
     </div>
@@ -295,6 +357,15 @@
   
   <!-- ===== ONGLET GRILLES ===== -->
   <div id="tab-grid" class="tab-content">
+    
+    <div class="card grid-section">
+      <h2>Paramètres généraux</h2>
+      <div class="grid-row">
+        <label>Taux de TVA</label>
+        <input type="number" id="cfg_general_tva" step="0.1">
+        <span class="unit">%</span>
+      </div>
+    </div>
     
     <div class="card grid-section">
       <h2>Démoussage toiture</h2>
@@ -542,6 +613,7 @@
   'use strict';
 
   var DEFAULTS = {
+    tvaRate: 0,
     toiture: { min: 210, seuilMin: 38, rates: [5.50, 4.50, 4.20, 3.90, 3.70, 3.50] },
     facade: { min: 250, rate0: 6.50, rates: [5.20, 4.60, 4.20, 3.90, 3.60] },
     solaire: { min: 180, forfaits: [215, 250, 305, 345, 425], rates: [0.85, 0.75, 0.65, 0.55] }
@@ -553,25 +625,22 @@
     solaire: { nom: 'Produit solaire', debit: 5, dosage: 3, temps: 0.15, prix: 10.00 }
   };
 
+  var DEFAULTS_ZONES = [{ type: 'toiture', surface: '' }];
+
   var config = null;
   var savedConfig = null;
   var dosage = null;
   var savedDosage = null;
+  var zones = null;
+  var currentMode = 'HT';
   var storageAvailable = true;
 
-  function deepClone(obj) {
-    return JSON.parse(JSON.stringify(obj));
-  }
+  function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
   function merge(base, override) {
-    var result = {};
-    var key;
-    for (key in base) {
-      if (base.hasOwnProperty(key)) result[key] = base[key];
-    }
-    for (key in override) {
-      if (override.hasOwnProperty(key)) result[key] = override[key];
-    }
+    var result = {}, key;
+    for (key in base) if (base.hasOwnProperty(key)) result[key] = base[key];
+    for (key in override) if (override.hasOwnProperty(key)) result[key] = override[key];
     return result;
   }
 
@@ -581,14 +650,13 @@
       if (saved) {
         var parsed = JSON.parse(saved);
         return {
+          tvaRate: parsed.tvaRate !== undefined ? parsed.tvaRate : DEFAULTS.tvaRate,
           toiture: merge(DEFAULTS.toiture, parsed.toiture || {}),
           facade: merge(DEFAULTS.facade, parsed.facade || {}),
           solaire: merge(DEFAULTS.solaire, parsed.solaire || {})
         };
       }
-    } catch (e) {
-      storageAvailable = false;
-    }
+    } catch (e) { storageAvailable = false; }
     return deepClone(DEFAULTS);
   }
 
@@ -603,16 +671,24 @@
           solaire: merge(DEFAULTS_DOSAGE.solaire, parsed.solaire || {})
         };
       }
-    } catch (e) {
-      storageAvailable = false;
-    }
+    } catch (e) { storageAvailable = false; }
     return deepClone(DEFAULTS_DOSAGE);
   }
 
-  function saveConfig() {
+  function loadZones() {
     try {
-      window.localStorage.setItem('tarifConfig', JSON.stringify(savedConfig));
-    } catch (e) {
+      var saved = window.localStorage.getItem('tarifZones');
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return deepClone(DEFAULTS_ZONES);
+  }
+
+  function saveConfig() {
+    try { window.localStorage.setItem('tarifConfig', JSON.stringify(savedConfig)); }
+    catch (e) {
       storageAvailable = false;
       var warn = document.getElementById('storageWarning');
       if (warn) warn.style.display = 'block';
@@ -620,11 +696,13 @@
   }
 
   function saveDosage() {
-    try {
-      window.localStorage.setItem('tarifDosage', JSON.stringify(savedDosage));
-    } catch (e) {
-      storageAvailable = false;
-    }
+    try { window.localStorage.setItem('tarifDosage', JSON.stringify(savedDosage)); }
+    catch (e) { storageAvailable = false; }
+  }
+
+  function saveZones() {
+    try { window.localStorage.setItem('tarifZones', JSON.stringify(zones)); }
+    catch (e) {}
   }
 
   function isDirty() {
@@ -644,20 +722,22 @@
   }
 
   function updateConfig(service, key, value, index) {
-    var num = parseFloat(value);
-    if (isNaN(num)) num = 0;
-    if (index !== undefined && index !== null) {
-      config[service][key][index] = num;
+    if (service === 'general') {
+      var num = parseFloat(value);
+      if (isNaN(num)) num = 0;
+      config[key] = num;
     } else {
-      config[service][key] = num;
+      var num = parseFloat(value);
+      if (isNaN(num)) num = 0;
+      if (index !== undefined && index !== null) config[service][key][index] = num;
+      else config[service][key] = num;
     }
     updateDirtyState();
   }
 
   function updateDosage(service, key, value) {
-    if (key === 'nom') {
-      dosage[service][key] = value;
-    } else {
+    if (key === 'nom') dosage[service][key] = value;
+    else {
       var num = parseFloat(value);
       if (isNaN(num)) num = 0;
       dosage[service][key] = num;
@@ -699,23 +779,16 @@
 
   function populateGrid() {
     var i;
+    document.getElementById('cfg_general_tva').value = config.tvaRate;
     document.getElementById('cfg_toiture_min').value = config.toiture.min;
     document.getElementById('cfg_toiture_seuilMin').value = config.toiture.seuilMin;
-    for (i = 0; i < 6; i++) {
-      document.getElementById('cfg_toiture_r' + i).value = config.toiture.rates[i];
-    }
+    for (i = 0; i < 6; i++) document.getElementById('cfg_toiture_r' + i).value = config.toiture.rates[i];
     document.getElementById('cfg_facade_min').value = config.facade.min;
     document.getElementById('cfg_facade_rate0').value = config.facade.rate0;
-    for (i = 0; i < 5; i++) {
-      document.getElementById('cfg_facade_r' + i).value = config.facade.rates[i];
-    }
+    for (i = 0; i < 5; i++) document.getElementById('cfg_facade_r' + i).value = config.facade.rates[i];
     document.getElementById('cfg_solaire_min').value = config.solaire.min;
-    for (i = 0; i < 5; i++) {
-      document.getElementById('cfg_solaire_f' + i).value = config.solaire.forfaits[i];
-    }
-    for (i = 0; i < 4; i++) {
-      document.getElementById('cfg_solaire_r' + i).value = config.solaire.rates[i];
-    }
+    for (i = 0; i < 5; i++) document.getElementById('cfg_solaire_f' + i).value = config.solaire.forfaits[i];
+    for (i = 0; i < 4; i++) document.getElementById('cfg_solaire_r' + i).value = config.solaire.rates[i];
     if (!storageAvailable) {
       var warn = document.getElementById('storageWarning');
       if (warn) warn.style.display = 'block';
@@ -723,13 +796,56 @@
   }
 
   function populateDosage() {
-    var services = ['toiture', 'facade', 'solaire'];
-    services.forEach(function(s) {
+    ['toiture', 'facade', 'solaire'].forEach(function(s) {
       document.getElementById('cfg_dosage_' + s + '_nom').value = dosage[s].nom;
       document.getElementById('cfg_dosage_' + s + '_debit').value = dosage[s].debit;
       document.getElementById('cfg_dosage_' + s + '_dosage').value = dosage[s].dosage;
       document.getElementById('cfg_dosage_' + s + '_temps').value = dosage[s].temps;
       document.getElementById('cfg_dosage_' + s + '_prix').value = dosage[s].prix;
+    });
+  }
+
+  function renderZones() {
+    var container = document.getElementById('zonesContainer');
+    container.innerHTML = '';
+    zones.forEach(function(zone, i) {
+      var div = document.createElement('div');
+      div.className = 'zone';
+      var header = '<div class="zone-header"><span>Zone ' + (i + 1) + '</span>';
+      if (zones.length > 1) header += '<button type="button" class="zone-remove" data-index="' + i + '">\u00D7</button>';
+      header += '</div>';
+      
+      var typeSelect = '<label>Type de prestation</label><select class="zone-type" data-index="' + i + '">' +
+        '<option value="toiture"' + (zone.type === 'toiture' ? ' selected' : '') + '>Démoussage toiture</option>' +
+        '<option value="facade"' + (zone.type === 'facade' ? ' selected' : '') + '>Nettoyage façade</option>' +
+        '<option value="solaire"' + (zone.type === 'solaire' ? ' selected' : '') + '>Nettoyage panneaux solaires</option>' +
+        '</select>';
+      
+      var surfaceInput = '<label>Surface (m²)</label>' +
+        '<input type="number" class="zone-surface" data-index="' + i + '" value="' + (zone.surface || '') + '" placeholder="Ex : 150" inputmode="decimal" min="1" step="1">';
+      
+      div.innerHTML = header + typeSelect + surfaceInput;
+      container.appendChild(div);
+    });
+    
+    container.querySelectorAll('.zone-type').forEach(function(sel) {
+      sel.addEventListener('change', function() {
+        zones[this.dataset.index].type = this.value;
+        saveZones();
+      });
+    });
+    container.querySelectorAll('.zone-surface').forEach(function(inp) {
+      inp.addEventListener('input', function() {
+        zones[this.dataset.index].surface = this.value;
+        saveZones();
+      });
+    });
+    container.querySelectorAll('.zone-remove').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        zones.splice(parseInt(this.dataset.index), 1);
+        saveZones();
+        renderZones();
+      });
     });
   }
 
@@ -778,28 +894,31 @@
     return S * c.rates[3];
   }
 
+  function getTypeName(t) {
+    if (t === 'toiture') return 'Démoussage toiture';
+    if (t === 'facade') return 'Nettoyage façade';
+    return 'Nettoyage panneaux solaires';
+  }
+
+  function getShortTypeName(t) {
+    if (t === 'toiture') return 'Toiture';
+    if (t === 'facade') return 'Façade';
+    return 'Solaire';
+  }
+
   function formatEuro(n) {
-    try {
-      return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20AC';
-    } catch (e) {
-      return n.toFixed(2) + ' \u20AC';
-    }
+    try { return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20AC'; }
+    catch (e) { return n.toFixed(2) + ' \u20AC'; }
   }
 
   function formatNombre(n, decimales) {
-    try {
-      return n.toLocaleString('fr-FR', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
-    } catch (e) {
-      return n.toFixed(decimales);
-    }
+    try { return n.toLocaleString('fr-FR', { minimumFractionDigits: decimales, maximumFractionDigits: decimales }); }
+    catch (e) { return n.toFixed(decimales); }
   }
 
   function showTab(name) {
-    var contents = document.querySelectorAll('.tab-content');
-    var tabs = document.querySelectorAll('.tab');
-    var i;
-    for (i = 0; i < contents.length; i++) contents[i].classList.remove('active');
-    for (i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+    document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('active'); });
     document.getElementById('tab-' + name).classList.add('active');
     if (name === 'calc') document.getElementById('tabBtnCalc').classList.add('active');
     else if (name === 'grid') document.getElementById('tabBtnGrid').classList.add('active');
@@ -808,71 +927,111 @@
 
   function calculer() {
     try {
-      var type = document.getElementById('type').value;
-      var surface = parseFloat(document.getElementById('surface').value);
       var errorEl = document.getElementById('error');
       var resultEl = document.getElementById('result');
-      
       errorEl.textContent = '';
       
-      if (isNaN(surface) || surface <= 0) {
-        errorEl.textContent = 'Veuillez saisir une surface valide.';
+      if (zones.length === 0) {
+        errorEl.textContent = 'Veuillez ajouter au moins une zone.';
         resultEl.classList.remove('visible');
         return;
       }
       
-      var total, detailHtml;
+      var totalSurface = 0;
+      var totalHT = 0;
+      var zoneResults = [];
+      var typeAgg = {};
       
-      if (type === 'toiture') {
-        total = calculerToiture(surface);
-        detailHtml = '<div class="detail-row"><span>Surface</span><span>' + surface + ' m\u00B2</span></div>';
-        detailHtml += '<div class="detail-row"><span>Prestation</span><span>D\u00E9moussage toiture</span></div>';
-        if (surface <= config.toiture.seuilMin) {
-          detailHtml += '<div class="detail-row"><span>Tarif</span><span>Minimum de facturation</span></div>';
+      for (var i = 0; i < zones.length; i++) {
+        var z = zones[i];
+        var surf = parseFloat(z.surface);
+        if (isNaN(surf) || surf <= 0) {
+          errorEl.textContent = 'Veuillez saisir une surface valide pour la zone ' + (i + 1) + '.';
+          resultEl.classList.remove('visible');
+          return;
         }
-      } else if (type === 'facade') {
-        total = calculerFacade(surface);
-        detailHtml = '<div class="detail-row"><span>Surface</span><span>' + surface + ' m\u00B2</span></div>';
-        detailHtml += '<div class="detail-row"><span>Prestation</span><span>Nettoyage fa\u00E7ade</span></div>';
-        if (surface <= 150 && surface * config.facade.rate0 < config.facade.min) {
-          detailHtml += '<div class="detail-row"><span>Tarif</span><span>Minimum de facturation</span></div>';
-        }
-      } else {
-        total = calculerSolaire(surface);
-        detailHtml = '<div class="detail-row"><span>Surface</span><span>' + surface + ' m\u00B2</span></div>';
-        detailHtml += '<div class="detail-row"><span>Prestation</span><span>Nettoyage panneaux solaires</span></div>';
-        if (surface <= 30) {
-          detailHtml += '<div class="detail-row"><span>Tarif</span><span>Minimum de facturation</span></div>';
-        } else if (surface <= 500) {
-          detailHtml += '<div class="detail-row"><span>Tarif</span><span>Forfait</span></div>';
-        }
+        
+        var totalZone;
+        if (z.type === 'toiture') totalZone = calculerToiture(surf);
+        else if (z.type === 'facade') totalZone = calculerFacade(surf);
+        else totalZone = calculerSolaire(surf);
+        
+        totalSurface += surf;
+        totalHT += totalZone;
+        zoneResults.push({ type: z.type, surface: surf, total: totalZone });
+        
+        if (!typeAgg[z.type]) typeAgg[z.type] = 0;
+        typeAgg[z.type] += surf;
       }
       
-      var prixM2 = total / surface;
-      detailHtml += '<div class="detail-row"><span>Prix moyen</span><span>' + formatEuro(prixM2) + ' / m\u00B2</span></div>';
+      var tvaRate = config.tvaRate || 0;
+      var tvaAmount = totalHT * (tvaRate / 100);
+      var totalTTC = totalHT + tvaAmount;
       
-      var d = dosage[type];
-      var tempsTotal = surface * d.temps;
-      var volumeSolution = tempsTotal * d.debit;
-      var produitPur = volumeSolution * (d.dosage / 100);
-      var coutProduit = produitPur * d.prix;
-      var coutProduitM2 = coutProduit / surface;
-      var margeBruteTotale = total - coutProduit;
-      var margeBruteM2 = margeBruteTotale / surface;
+      var displayTotal = (currentMode === 'TTC') ? totalTTC : totalHT;
+      var displayLabel = (currentMode === 'TTC') ? 'Total TTC' : 'Total HT';
       
-      detailHtml += '<div class="detail-section">Produit n\u00E9cessaire</div>';
-      detailHtml += '<div class="detail-row"><span>Produit</span><span>' + d.nom + '</span></div>';
-      detailHtml += '<div class="detail-row"><span>Temps total</span><span>' + formatNombre(tempsTotal, 1) + ' min</span></div>';
-      detailHtml += '<div class="detail-row"><span>Solution totale</span><span>' + formatNombre(volumeSolution, 1) + ' L</span></div>';
-      detailHtml += '<div class="detail-row"><span>Produit pur</span><span>' + formatNombre(produitPur, 2) + ' L</span></div>';
-      detailHtml += '<div class="detail-row"><span>Co\u00FBt produit</span><span>' + formatEuro(coutProduit) + '</span></div>';
-      detailHtml += '<div class="detail-row"><span>Co\u00FBt produit / m\u00B2</span><span>' + formatEuro(coutProduitM2) + '</span></div>';
+      var detailHtml = '';
       
+      if (zoneResults.length > 1) {
+        detailHtml += '<div class="detail-section">Détail par zone</div>';
+        zoneResults.forEach(function(z, idx) {
+          detailHtml += '<div class="detail-row"><span>Zone ' + (idx + 1) + ' – ' + getTypeName(z.type) + '</span><span>' + z.surface + ' m² → ' + formatEuro(z.total) + '</span></div>';
+        });
+      }
+      
+      if (tvaRate > 0) {
+        detailHtml += '<div class="detail-section">Totaux</div>';
+        detailHtml += '<div class="detail-row"><span>Total HT</span><span>' + formatEuro(totalHT) + '</span></div>';
+        detailHtml += '<div class="detail-row"><span>TVA ' + tvaRate + ' %</span><span>' + formatEuro(tvaAmount) + '</span></div>';
+        detailHtml += '<div class="detail-row"><span>Total TTC</span><span>' + formatEuro(totalTTC) + '</span></div>';
+      }
+      
+      var prixM2 = totalHT / totalSurface;
+      detailHtml += '<div class="detail-row"><span>Prix moyen HT</span><span>' + formatEuro(prixM2) + ' / m²</span></div>';
+      
+      detailHtml += '<div class="detail-section">Produit nécessaire</div>';
+      var totalSolution = 0, totalProduitPur = 0, totalCoutProduit = 0;
+      var typeKeys = Object.keys(typeAgg);
+      
+      typeKeys.forEach(function(t) {
+        var d = dosage[t];
+        var surf = typeAgg[t];
+        var tempsTotal = surf * d.temps;
+        var volumeSolution = tempsTotal * d.debit;
+        var produitPur = volumeSolution * (d.dosage / 100);
+        var coutProduit = produitPur * d.prix;
+        
+        totalSolution += volumeSolution;
+        totalProduitPur += produitPur;
+        totalCoutProduit += coutProduit;
+        
+        if (typeKeys.length > 1) {
+          detailHtml += '<div class="detail-row"><span>' + getShortTypeName(t) + ' (' + d.nom + ')</span><span>' + formatNombre(produitPur, 2) + ' L → ' + formatEuro(coutProduit) + '</span></div>';
+        } else {
+          detailHtml += '<div class="detail-row"><span>Produit</span><span>' + d.nom + '</span></div>';
+        }
+      });
+      
+      if (typeKeys.length === 1) {
+        var d0 = dosage[typeKeys[0]];
+        var s0 = typeAgg[typeKeys[0]];
+        detailHtml += '<div class="detail-row"><span>Temps total</span><span>' + formatNombre(s0 * d0.temps, 1) + ' min</span></div>';
+      }
+      
+      detailHtml += '<div class="detail-row"><span>Solution totale</span><span>' + formatNombre(totalSolution, 1) + ' L</span></div>';
+      detailHtml += '<div class="detail-row"><span>Produit pur total</span><span>' + formatNombre(totalProduitPur, 2) + ' L</span></div>';
+      detailHtml += '<div class="detail-row"><span>Coût produit total</span><span>' + formatEuro(totalCoutProduit) + '</span></div>';
+      detailHtml += '<div class="detail-row"><span>Coût produit / m²</span><span>' + formatEuro(totalCoutProduit / totalSurface) + '</span></div>';
+      
+      var margeTotale = totalHT - totalCoutProduit;
+      var margeM2 = margeTotale / totalSurface;
       detailHtml += '<div class="detail-section">Marge brute</div>';
-      detailHtml += '<div class="detail-row marge"><span>Marge brute totale</span><span>' + formatEuro(margeBruteTotale) + '</span></div>';
-      detailHtml += '<div class="detail-row marge"><span>Marge brute / m\u00B2</span><span>' + formatEuro(margeBruteM2) + '</span></div>';
+      detailHtml += '<div class="detail-row marge"><span>Marge brute totale</span><span>' + formatEuro(margeTotale) + '</span></div>';
+      detailHtml += '<div class="detail-row marge"><span>Marge brute / m²</span><span>' + formatEuro(margeM2) + '</span></div>';
       
-      document.getElementById('resultMain').textContent = formatEuro(total);
+      document.getElementById('resultMain').textContent = formatEuro(displayTotal);
+      document.getElementById('resultLabel').textContent = displayLabel;
       document.getElementById('detail').innerHTML = detailHtml;
       resultEl.classList.add('visible');
     } catch (err) {
@@ -885,8 +1044,10 @@
     savedConfig = deepClone(config);
     dosage = loadDosage();
     savedDosage = deepClone(dosage);
+    zones = loadZones();
     populateGrid();
     populateDosage();
+    renderZones();
     updateDirtyState();
     
     document.getElementById('tabBtnCalc').addEventListener('click', function() { showTab('calc'); });
@@ -898,14 +1059,28 @@
     document.getElementById('btnSave').addEventListener('click', validateChanges);
     document.getElementById('btnCancel').addEventListener('click', cancelChanges);
     
+    document.getElementById('btnAddZone').addEventListener('click', function() {
+      zones.push({ type: 'toiture', surface: '' });
+      saveZones();
+      renderZones();
+    });
+    
+    document.querySelectorAll('.seg-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.seg-btn').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        currentMode = this.dataset.mode;
+        if (document.getElementById('result').classList.contains('visible')) calculer();
+      });
+    });
+    
     function bind(id, service, key, index) {
       var el = document.getElementById(id);
       if (!el) return;
-      el.addEventListener('input', function() {
-        updateConfig(service, key, this.value, index);
-      });
+      el.addEventListener('input', function() { updateConfig(service, key, this.value, index); });
     }
     
+    bind('cfg_general_tva', 'general', 'tvaRate');
     bind('cfg_toiture_min', 'toiture', 'min');
     bind('cfg_toiture_seuilMin', 'toiture', 'seuilMin');
     bind('cfg_toiture_r0', 'toiture', 'rates', 0);
@@ -914,7 +1089,6 @@
     bind('cfg_toiture_r3', 'toiture', 'rates', 3);
     bind('cfg_toiture_r4', 'toiture', 'rates', 4);
     bind('cfg_toiture_r5', 'toiture', 'rates', 5);
-    
     bind('cfg_facade_min', 'facade', 'min');
     bind('cfg_facade_rate0', 'facade', 'rate0');
     bind('cfg_facade_r0', 'facade', 'rates', 0);
@@ -922,7 +1096,6 @@
     bind('cfg_facade_r2', 'facade', 'rates', 2);
     bind('cfg_facade_r3', 'facade', 'rates', 3);
     bind('cfg_facade_r4', 'facade', 'rates', 4);
-    
     bind('cfg_solaire_min', 'solaire', 'min');
     bind('cfg_solaire_f0', 'solaire', 'forfaits', 0);
     bind('cfg_solaire_f1', 'solaire', 'forfaits', 1);
@@ -937,9 +1110,7 @@
     function bindDosage(id, service, key) {
       var el = document.getElementById(id);
       if (!el) return;
-      el.addEventListener('input', function() {
-        updateDosage(service, key, this.value);
-      });
+      el.addEventListener('input', function() { updateDosage(service, key, this.value); });
     }
     
     ['toiture', 'facade', 'solaire'].forEach(function(s) {
@@ -951,11 +1122,8 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 </script>
 </body>
